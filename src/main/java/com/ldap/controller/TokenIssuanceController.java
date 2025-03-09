@@ -2,7 +2,9 @@ package com.ldap.controller;
 
 import com.ldap.model.TokenIssuanceRequest;
 import com.ldap.model.TokenIssuanceResponse;
+import com.ldap.service.TokenIssuanceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,17 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class TokenIssuanceController {
 
+    private final TokenIssuanceService tokenIssuanceService;
+
+    @Autowired
+    public TokenIssuanceController(TokenIssuanceService tokenIssuanceService) {
+        this.tokenIssuanceService = tokenIssuanceService;
+    }
+
     @PostMapping("/endpoint")
     public ResponseEntity<TokenIssuanceResponse> handleTokenIssuance(@RequestBody TokenIssuanceRequest request) {
-        log.info("Received token issuance request: {}", request);
+        log.info("Received token issuance request for tenant: {}", request.getData().getTenantId());
         
-        // Process the request
-        // In a real application, you would implement your business logic here
-        // For now, we'll just return the default response
+        // Process the request using the service
+        TokenIssuanceResponse response = tokenIssuanceService.processTokenIssuance(request);
         
-        TokenIssuanceResponse response = TokenIssuanceResponse.createDefaultResponse();
-        
-        log.info("Sending response: {}", response);
+        log.info("Sending response with claims");
         return ResponseEntity.ok(response);
     }
 } 
